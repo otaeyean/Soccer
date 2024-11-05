@@ -4,6 +4,7 @@ import 'board.dart';
 import 'info.dart';
 import 'customization.dart';
 import 'schedule.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -12,6 +13,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey, // 하단바 배경색 설정
+          selectedItemColor: Colors.red, // 선택된 아이템 색상
+          unselectedItemColor: Colors.grey, // 선택되지 않은 아이템 색상
+        ),
+      ),
       home: MyHomePage(),
     );
   }
