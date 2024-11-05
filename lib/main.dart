@@ -4,6 +4,10 @@ import 'board.dart';
 import 'info.dart';
 import 'customization.dart';
 import 'schedule.dart';
+import 'chating.dart'; 
+import 'login_page.dart'; 
+import 'signup_page.dart'; 
+
 void main() {
   runApp(MyApp());
 }
@@ -12,6 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey,
+          selectedItemColor: Color(0xFF37003C),
+          unselectedItemColor: Colors.grey,
+        ),
+      ),
       home: MyHomePage(),
     );
   }
@@ -44,6 +55,42 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flutter App'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text(
+                'KICKOFF',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+              decoration: BoxDecoration(
+                color: const  Color(0xFF37003C),
+              ),
+            ),
+            ListTile(
+              title: Text('로그인'),
+              onTap: () {
+                Navigator.pop(context); // 사이드바 닫기
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('회원가입'),
+              onTap: () {
+                Navigator.pop(context); // 사이드바 닫기
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignupPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: IndexedStack(
         index: _currentIndex,
