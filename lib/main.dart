@@ -6,9 +6,15 @@ import 'customization.dart';
 import 'schedule.dart';
 import 'chating.dart'; 
 import 'login_page.dart'; 
-import 'signup_page.dart'; 
+import 'signup_page.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await initializeDateFormatting('ko_KR', null);
   runApp(MyApp());
 }
 
