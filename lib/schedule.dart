@@ -95,7 +95,13 @@ class GameListItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ChatingPage()),
+          MaterialPageRoute(
+            builder: (context) => ChatingPage(
+              team1: match['team1'] ?? 'Team1',
+              team2: match['team2'] ?? 'Team2',
+              round: match['round'] ?? 'Unknown Round',
+            ),
+          ),
         );
       },
       child: Container(
