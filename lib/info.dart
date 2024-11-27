@@ -1,4 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class Player {
+  final String name;
+  final String number;
+  final String position;
+  final String imageUrl;
+
+  Player({
+    required this.name,
+    required this.number,
+    required this.position,
+    required this.imageUrl,
+  });
+}
 
 class InfoPage extends StatefulWidget {
   @override
@@ -8,43 +23,76 @@ class InfoPage extends StatefulWidget {
 class _InfoPageState extends State<InfoPage> {
   String selectedTeam = '팀 선택';
   final Color customColor = Color(0xFF37003C);
-
-  final List<String> teamArray = ['팀 선택', 'AFC 본머스', '노팅엄 포레스트 FC', '뉴캐슬 유나이티드', 
-  '레스터 시티 FC', '리버풀 FC', '맨체스터 시티 FC', '맨체스터 유나이티드', '브라이튼 앤 호브 알비온 FC', 
-  '브렌트포드 FC', '사우샘프턴 FC', '아스널 FC', '애스턴 빌라 FC', '에버턴 FC', '울버햄튼 원더러스 FC', 
-  '웨스트햄 유나이티드', '입스위치 타운', '첼시 FC', '크리스탈 팰리스 FC', '토트넘 훗스퍼', '풀럼 FC'];
-
-  // 임시 선수 데이터 리스트
-  final List<Map<String, String>> playerList = [
-    {
-      'name': '히샬리송',
-      'number': '9',
-      'position': '공격수',
-      'birthday': '1997.05.10',
-      'height': '184cm',
-      'weight': '71kg',
-    },
-      {
-    'name': '해리 케인',
-    'number': '10',
-    'position': '공격수',
-    'birthday': '1993.07.28',
-    'height': '188cm',
-    'weight': '86kg',
-  },
-  {
-    'name': '손흥민',
-    'number': '7',
-    'position': '공격수',
-    'birthday': '1992.07.08',
-    'height': '183cm',
-    'weight': '78kg',
-  },
+  final List<String> teamArray = [
+    '팀 선택',
+    'AFC 본머스',
+    '노팅엄 포레스트 FC',
+    '뉴캐슬 유나이티드',
+    '레스터 시티 FC',
+    '리버풀 FC',
+    '맨체스터 시티 FC',
+    '맨체스터 유나이티드',
+    '브라이튼 앤 호브 알비온 FC',
+    '브렌트포트 FC',
+    '사우샘프턴 FC',
+    '아스널 FC',
+    '애스턴 빌라 FC',
+    '에버턴 FC',
+    '울버햄튼 원더러스 FC',
+    '웨스트햄 유나이티드',
+    '입스위치 타운',
+    '첼시 FC',
+    '크리스탈 팰리스 FC',
+    '토트넘 홋스퍼',
+    '풀럼 FC'
   ];
+
+  Future<List<Player>>? _playerListFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _playerListFuture = fetchPlayersFromFirestore(); // 초기 데이터 로드
+  }
+
+  Future<List<Player>> fetchPlayersFromFirestore() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    print('Fetching players for team: $selectedTeam'); // 팀 이름 출력
+
+    QuerySnapshot snapshot = await firestore
+        .collection('team_players')
+        .where('team', isEqualTo: selectedTeam) // 선택한 팀 필터링
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      print('No players found for team: $selectedTeam'); // 데이터 없음 확인
+    } else {
+      print('${snapshot.docs.length} players found for team: $selectedTeam'); // 데이터 수 확인
+    }
+
+    return snapshot.docs.map((doc) {
+      var firestoreData = doc.data() as Map<String, dynamic>;
+      String rawUrl = firestoreData['image_url'] ?? 'https://via.placeholder.com/100';
+      String cleanedUrl = rawUrl.startsWith('//') ? 'https:$rawUrl' : rawUrl;
+
+      return Player(
+        name: firestoreData['name'] ?? '',
+        number: firestoreData['number'].toString(),
+        position: firestoreData['position'] ?? '',
+        imageUrl: cleanedUrl,
+      );
+    }).toList();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('팀 선수 목록'),
+      ),
       body: Column(
         children: [
           Padding(
@@ -54,27 +102,22 @@ class _InfoPageState extends State<InfoPage> {
               children: [
                 Text(
                   '홈구장:',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(fontSize: 16),
                 ),
                 DropdownButton<String>(
                   value: selectedTeam,
-                  icon: Icon(Icons.arrow_downward, color: customColor,),
+                  icon: Icon(Icons.arrow_downward, color: customColor),
                   iconSize: 24,
                   elevation: 16,
                   style: TextStyle(color: customColor),
-                  underline: Container(
-                    height: 2,
-                    color: customColor,
-                  ),
+                  underline: Container(height: 2, color: customColor),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedTeam = newValue!;
+                      _playerListFuture = fetchPlayersFromFirestore();
                     });
                   },
-                  items: teamArray
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: teamArray.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -85,18 +128,30 @@ class _InfoPageState extends State<InfoPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: playerList.length,
-              itemBuilder: (context, index) {
-                final player = playerList[index];
-                return PlayerListItem(
-                  name: player['name']!,
-                  number: player['number']!,
-                  position: player['position']!,
-                  birthday: player['birthday']!,
-                  height: player['height']!,
-                  weight: player['weight']!,
-                );
+            child: FutureBuilder<List<Player>>(
+              future: _playerListFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('오류가 발생했습니다.'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('선수 데이터가 없습니다.'));
+                } else {
+                  final playerList = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: playerList.length,
+                    itemBuilder: (context, index) {
+                      final player = playerList[index];
+                      return PlayerListItem(
+                        name: player.name,
+                        number: player.number,
+                        position: player.position,
+                        imageUrl: player.imageUrl,
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),
@@ -110,92 +165,71 @@ class PlayerListItem extends StatelessWidget {
   final String name;
   final String number;
   final String position;
-  final String birthday;
-  final String height;
-  final String weight;
+  final String imageUrl;
 
   PlayerListItem({
     required this.name,
     required this.number,
     required this.position,
-    required this.birthday,
-    required this.height,
-    required this.weight,
+    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(15),
-      child: Row(
-        children: [
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      padding: const EdgeInsets.all(15),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              ClipOval(
+                child: Image.network(
+                  imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Image load error: $error'); // 디버깅용
+                    return Icon(
+                      Icons.error_outline, // 대체 아이콘
+                      size: 60,
+                      color: Colors.red,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-                SizedBox(height: 3),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 5, top: 2),
-                      child: Text(
-                        number,
-                        style: TextStyle(
-                          fontSize: 21,
-                          fontWeight: FontWeight.bold,
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          '번호: $number',
+                          style: TextStyle(fontSize: 18),
                         ),
-                      ),
+                        SizedBox(width: 10),
+                        Text(
+                          '포지션: $position',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                    SizedBox(width: 8),
-                    Text(
-                      position,
-                      style: TextStyle(
-                        fontSize: 21,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 3),
-                Row(
-                  children: [
-                    Text(
-                      birthday,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      height,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      weight,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
