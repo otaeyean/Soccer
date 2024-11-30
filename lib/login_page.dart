@@ -25,12 +25,13 @@ class LoginPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // 안내 텍스트
+            
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                 children: [
-                  TextSpan(text: '반갑습니다!\n '),
+                  TextSpan(text: '반갑습de니다!\n '),
                   TextSpan(
                     text: '로그인',
                     style: TextStyle(color: Colors.deepPurple),

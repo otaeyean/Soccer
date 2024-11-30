@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 const Color purple = Color(0xFF37003C);
@@ -52,35 +52,58 @@ class TeamRankingView extends StatelessWidget {
 
             final topTeams = snapshot.data!.docs;
 
-            // 순위별 아이콘 크기를 다르게 조정
-            return Container(
-              padding: EdgeInsets.all(8.0),
-              color: Colors.grey[200],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(topTeams.length, (index) {
-                  final team = topTeams[index].data();
-                  double iconSize = 30.0;
+            // 순위를 2위, 1위, 3위 순으로 재정렬
+            topTeams.sort((a, b) {
+              if (a['순위'] == 2) return -1;
+              if (b['순위'] == 2) return 1;
+              if (a['순위'] == 1) return -1;
+              if (b['순위'] == 1) return 1;
+              return a['순위'].compareTo(b['순위']);
+            });
+          // 동적인 상단 부분에서 로고 출력
+return Container(
+  padding: EdgeInsets.all(8.0),
+  color: Colors.grey[200],
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: List.generate(topTeams.length, (index) {
+      final team = topTeams[index].data();
+      double iconSize = 30.0;
 
-                  // 순위에 따라 아이콘 크기 설정
-                  if (team['순위'] == 1) iconSize = 60.0;
-                  if (team['순위'] == 2) iconSize = 50.0;
-                  if (team['순위'] == 3) iconSize = 40.0;
+      // 순위에 따라 아이콘 크기 설정
+      if (team['순위'] == 1) iconSize = 60.0;
+      if (team['순위'] == 2) iconSize = 50.0;
+      if (team['순위'] == 3) iconSize = 40.0;
 
-                  return Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.star, size: iconSize),
-                        SizedBox(height: 5),
-                        Text('순위 ${team['순위']}'),
-                        Text(team['팀']),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            );
+      // 로고 출력, 없을 경우 기본 로고 사용
+      String teamLogo = 'assets/${team['팀']}.png';
+      return Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              teamLogo,
+              width: iconSize,
+              height: iconSize,
+              errorBuilder: (context, error, stackTrace) {
+                // 로고가 없을 경우 기본 로고 사용
+                return Image.asset(
+                  'assets/default_logo.png',
+                  width: iconSize,
+                  height: iconSize,
+                );
+              },
+            ),
+            SizedBox(height: 5),
+            Text('순위 ${team['순위']}'),
+            Text(team['팀']),
+          ],
+        ),
+      );
+    }),
+  ),
+);
+
           },
         ),
         // 테이블
@@ -117,6 +140,15 @@ class PlayerRankingView extends StatelessWidget {
             }
 
             final topPlayers = snapshot.data!.docs;
+
+            // 순위를 2위, 1위, 3위 순으로 재정렬
+            topPlayers.sort((a, b) {
+              if (a['순위'] == 2) return -1;
+              if (b['순위'] == 2) return 1;
+              if (a['순위'] == 1) return -1;
+              if (b['순위'] == 1) return 1;
+              return a['순위'].compareTo(b['순위']);
+            });
 
             // 순위별 아이콘 크기를 다르게 조정
             return Container(
@@ -185,7 +217,7 @@ class TeamRankingTable extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: DataTable(
             columnSpacing: MediaQuery.of(context).size.width * 0.02,
-            headingRowColor: WidgetStateProperty.all(purple),
+            headingRowColor: MaterialStateProperty.all(purple),
             headingTextStyle: TextStyle(color: Colors.white),
             columns: [
               DataColumn(label: Text('순위')),
@@ -201,9 +233,29 @@ class TeamRankingTable extends StatelessWidget {
             ],
             rows: teamRanks.map((team) {
               final data = team.data();
+              String teamLogo = 'assets/${data['팀']}.png';  // 로고 이미지 경로
+
               return DataRow(cells: [
                 DataCell(Text('${data['순위']}')),
-                DataCell(Text(data['팀'] ?? '')),
+                DataCell(Row(
+                  children: [
+                    Image.asset(
+                      teamLogo,
+                      width: 40.0,
+                      height: 40.0,
+                      errorBuilder: (context, error, stackTrace) {
+                        // 로고가 없을 경우 기본 로고 사용
+                        return Image.asset(
+                          'assets/default_logo.png',
+                          width: 40.0,
+                          height: 40.0,
+                        );
+                      },
+                    ),
+                    SizedBox(width: 10),
+                    Text(data['팀'] ?? ''),
+                  ],
+                )),
                 DataCell(Text('${data['경기']}')),
                 DataCell(Text('${data['승']}')),
                 DataCell(Text('${data['무']}')),
@@ -220,6 +272,7 @@ class TeamRankingTable extends StatelessWidget {
     );
   }
 }
+
 
 class PlayerRankingTable extends StatelessWidget {
   @override
