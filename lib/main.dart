@@ -7,7 +7,6 @@ import 'schedule.dart';
 import 'chating.dart'; 
 import 'login_page.dart'; 
 import 'signup_page.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -60,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter App'),
+        title: Text('KICK OFF', style: TextStyle(fontFamily: "GmarketBold"),),
       ),
       drawer: Drawer(
         child: ListView(
@@ -69,14 +68,14 @@ class _MyHomePageState extends State<MyHomePage> {
             DrawerHeader(
               child: Text(
                 'KICKOFF',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                style: TextStyle(color: Colors.white, fontSize: 24, fontFamily: "GmarketBold"),
               ),
               decoration: BoxDecoration(
                 color: const  Color(0xFF37003C),
               ),
             ),
             ListTile(
-              title: Text('로그인'),
+              title: Text('로그인', style: TextStyle(fontFamily: "GmarketBold"),),
               onTap: () {
                 Navigator.pop(context); // 사이드바 닫기
                 Navigator.push(
@@ -86,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              title: Text('회원가입'),
+              title: Text('회원가입', style: TextStyle(fontFamily: "GmarketBold"),),
               onTap: () {
                 Navigator.pop(context); // 사이드바 닫기
                 Navigator.push(
@@ -103,6 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedLabelStyle: TextStyle(fontFamily: "GmarketMedium"),
         currentIndex: _currentIndex,
         onTap: _onTap,
         items: [
