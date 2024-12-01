@@ -16,7 +16,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('로그인'),
+        title: Text('로그인', style: TextStyle(fontFamily: "GmarketBold"),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -28,12 +28,12 @@ class LoginPage extends StatelessWidget {
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, color: Colors.black, fontFamily: "GmarketBold"),
                 children: [
                   TextSpan(text: '반갑습니다!\n '),
                   TextSpan(
                     text: '로그인',
-                    style: TextStyle(color: Colors.deepPurple),
+                    style: TextStyle(color: Colors.deepPurple, fontFamily: "GmarketBold"),
                   ),
                   TextSpan(text: '을 해주세요.\n\n'),
                 ],
@@ -43,7 +43,7 @@ class LoginPage extends StatelessWidget {
             // ID 입력란
             Text(
               'ID',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontFamily: "GmarketBold"),
             ),
             SizedBox(height: 8),
             Container(
@@ -55,7 +55,7 @@ class LoginPage extends StatelessWidget {
               child: TextField(
                 controller: _idController,
                 decoration: InputDecoration(
-                  hintText: '아이디를 입력해주세요',
+                  hintText: '아이디를 입력해주세요',hintStyle: TextStyle(fontFamily: "GmarketMedium"),
                   border: InputBorder.none,
                 ),
               ),
@@ -64,7 +64,7 @@ class LoginPage extends StatelessWidget {
             // 비밀번호 입력란
             Text(
               'PW',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16,  fontFamily: "GmarketBold"),
             ),
             SizedBox(height: 8),
             Container(
@@ -76,7 +76,7 @@ class LoginPage extends StatelessWidget {
               child: TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  hintText: '비밀번호를 입력해주세요',
+                  hintText: '비밀번호를 입력해주세요', hintStyle: TextStyle(fontFamily: "GmarketMedium"),
                   border: InputBorder.none,
                 ),
                 obscureText: true,
@@ -91,7 +91,7 @@ class LoginPage extends StatelessWidget {
                   onPressed: _login,
                   child: Text(
                     '로그인',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white,  fontFamily: "GmarketBold"),
                   ),
                     style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF37003C), // 버튼 배경색

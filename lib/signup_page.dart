@@ -47,7 +47,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원가입'),
+        title: Text('회원가입', style: TextStyle(fontFamily: "GmarketBold"),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,14 +59,14 @@ class _SignupPageState extends State<SignupPage> {
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, color: Colors.black, fontFamily: "GmarketBold"),
                 children: [
                   TextSpan(text: '회원님의\n '),
                   TextSpan(
                     text: '계정',
-                    style: TextStyle(color: Colors.deepPurple),
+                    style: TextStyle(color: Colors.deepPurple, fontFamily: "GmarketBold"),
                   ),
-                  TextSpan(text: '을 만들어주세요.\n\n'),
+                  TextSpan(text: '을 만들어주세요.\n\n', style: TextStyle(fontFamily: "GmarketBold")),
                 ],
               ),
             ),
@@ -74,7 +74,7 @@ class _SignupPageState extends State<SignupPage> {
             // 아이디 입력란
             Text(
               'ID',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontFamily: "GmarketBold"),
             ),
             SizedBox(height: 8),
             Container(
@@ -86,7 +86,7 @@ class _SignupPageState extends State<SignupPage> {
               child: TextField(
                 controller: _idController,
                 decoration: InputDecoration(
-                  hintText: '아이디를 입력해주세요',
+                  hintText: '아이디를 입력해주세요', hintStyle: TextStyle(fontFamily: "GmarketMedium"),
                   border: InputBorder.none, // 테두리 제거
                 ),
               ),
@@ -96,12 +96,12 @@ class _SignupPageState extends State<SignupPage> {
             // 비밀번호 입력란
             Text(
               'PW',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontFamily: "GmarketBold"),
             ),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: '비밀번호',
+                labelText: '비밀번호', labelStyle: TextStyle(fontFamily: "GmarketMedium"),
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
@@ -115,12 +115,12 @@ class _SignupPageState extends State<SignupPage> {
             // 이메일 입력란
             Text(
               'Email',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontFamily: "GmarketBold"),
             ),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
-                labelText: '이메일',
+                labelText: '이메일', labelStyle: TextStyle(fontFamily: "GmarketMidium"),
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
@@ -138,7 +138,7 @@ class _SignupPageState extends State<SignupPage> {
                   onPressed: _signUp,
                   child: Text(
                     '회원가입 하기',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontFamily: "GmarketBold"),
                   ),
                     style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF37003C), // 버튼 배경색
