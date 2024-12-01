@@ -149,6 +149,7 @@ class _ChatingPageState extends State<ChatingPage> {
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue, // 시간 강조 색상
+                  fontFamily: "GmarketBold", // 폰트 적용
                 ),
               ),
             ),
@@ -158,6 +159,7 @@ class _ChatingPageState extends State<ChatingPage> {
               style: TextStyle(
                 fontSize: 14,
                 color: hasTime ? Colors.black : Colors.white, // 시간 있을 때는 검정, 없을 때는 흰색
+                fontFamily: "GmarketBold", // 폰트 적용
               ),
               overflow: TextOverflow.ellipsis, // 텍스트가 길어지면 ... 처리
             ),
@@ -180,7 +182,10 @@ class _ChatingPageState extends State<ChatingPage> {
         ),
         child: Text(
           message,
-          style: TextStyle(fontSize: 12),
+          style: TextStyle(
+            fontSize: 12,
+            fontFamily: "GmarketMedium", // 폰트 적용
+          ),
         ),
       ),
     );
@@ -190,7 +195,7 @@ class _ChatingPageState extends State<ChatingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.team1} vs ${widget.team2} - ${widget.round}'),
+        title: Text('${widget.team1} vs ${widget.team2} - ${widget.round}', style: TextStyle(fontFamily: "GmarketBold")),
       ),
       body: Column(
         children: [
@@ -226,7 +231,7 @@ class _ChatingPageState extends State<ChatingPage> {
                       }
 
                       if (!snapshot.hasData) {
-                        return Center(child: Text('No messages'));
+                        return Center(child: Text('No messages', style: TextStyle(fontFamily: "GmarketBold")));
                       }
 
                       final chatDocs = snapshot.data!.docs;
@@ -251,11 +256,12 @@ class _ChatingPageState extends State<ChatingPage> {
                           controller: _messageController,
                           decoration: InputDecoration(
                             hintText: '메시지를 입력하세요',
+                            hintStyle: TextStyle(fontFamily: "GmarketMedium"),
                             filled: true, // 배경 색상을 사용
                             fillColor: Colors.white, // 배경 색상 설정
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20), // 둥근 테두리
-                              borderSide: BorderSide.none, // 테두리 제거
+                              borderSide: BorderSide.none, // 테두리 없앰
                             ),
                           ),
                         ),
