@@ -28,8 +28,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('userName'); // SharedPreferences에서 userName 가져오기
-      _isUserNameLoaded = true; // 로드 완료
+      _userName = prefs.getString('userName');
+      _isUserNameLoaded = true;
     });
   }
 
@@ -66,7 +66,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // 댓글 수 증가
       await _firestore.collection('posts').doc(widget.postId).update({
         'commentCount': FieldValue.increment(1),
       });
@@ -106,6 +105,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('게시글 상세', style: TextStyle(fontFamily: "GmarketBold")),
+        backgroundColor: Colors.indigo,
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: _firestore.collection('posts').doc(widget.postId).snapshots(),
@@ -118,14 +118,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(post['title'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: "GmarketBold")),
+                Text(post['title'], style: TextStyle(fontSize: 28, fontFamily: "GmarketBold")),
                 SizedBox(height: 8),
-                Text('작성자: ${post['username']} • ${post['timestamp'].toDate().toString().substring(0, 16)}',
-                    style: TextStyle(color: Colors.grey, fontFamily: "GmarketMedium")),
+                Text(
+                  '작성자: ${post['username']} • ${post['timestamp'].toDate().toString().substring(0, 16)}',
+                  style: TextStyle(color: Colors.grey, fontSize: 14, fontFamily: "GmarketMedium"),
+                ),
                 SizedBox(height: 16),
-                Text(post['content'], style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium")),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    post['content'],
+                    style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium"),
+                  ),
+                ),
                 Divider(height: 32),
-                Text('댓글', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: "GmarketBold")),
+                Text('댓글', style: TextStyle(fontSize: 20, fontFamily: "GmarketBold")),
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
                     stream: _firestore.collection('posts').doc(widget.postId).collection('comments').orderBy('timestamp').snapshots(),
@@ -136,15 +148,39 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           var comment = snapshot.data!.docs[index];
-                          return ListTile(
-                            title: Text(comment['content'], style: TextStyle(fontFamily: "GmarketMedium")),
-                            subtitle: Text(comment['username'], style: TextStyle(fontFamily: "GmarketMedium")),
-                            trailing: user != null && comment['username'] == _userName
-                                ? IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () => _deleteComment(comment.id, comment['username']),
-                            )
-                                : null,
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '댓글 작성자 : ${comment['username']}',
+                                      style: TextStyle(
+                                        fontFamily: "GmarketLight",
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      comment['content'],
+                                      style: TextStyle(fontFamily: "GmarketMedium", fontSize: 14),
+                                    ),
+                                    if (user != null && comment['username'] == _userName)
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                          onPressed: () => _deleteComment(comment.id, comment['username']),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           );
                         },
                       );
@@ -152,19 +188,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                 ),
                 if (user != null)
-                  TextField(
-                    controller: _commentController,
-                    decoration: const InputDecoration(
-                      labelText: '댓글 작성',
-                      border: OutlineInputBorder(),
-                      labelStyle: TextStyle(fontFamily: "GmarketMedium"),
-                    ),
-                    onSubmitted: (value) => _addComment(value),
-                  )
-                else
-                  const Text(
-                    '로그인 후 댓글을 작성할 수 있습니다.',
-                    style: TextStyle(color: Colors.red, fontFamily: "GmarketMedium"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _commentController,
+                          decoration: InputDecoration(
+                            labelText: '댓글 작성',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            labelStyle: TextStyle(fontFamily: "GmarketMedium"),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send, color: Colors.indigo),
+                        onPressed: () => _addComment(_commentController.text),
+                      ),
+                    ],
                   ),
               ],
             ),

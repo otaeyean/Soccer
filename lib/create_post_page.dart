@@ -24,12 +24,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
     _loadUserName();
   }
 
-  // SharedPreferences에서 userName을 불러오는 함수
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('userName');  // userName 값 불러오기
-      _isUserNameLoaded = true;  // 값이 로드되었음을 표시
+      _userName = prefs.getString('userName');
+      _isUserNameLoaded = true;
     });
   }
 
@@ -67,11 +66,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
         'content': contentController.text.trim(),
         'userId': _user!.uid,
         'username': username,
-        'timestamp': DateTime.now(),  // timestamp가 null일 경우 현재 시간 사용
+        'timestamp': DateTime.now(),
         'commentCount': 0,
       });
 
-      Navigator.pop(context);  // 게시글 작성 후 뒤로 가기
+      Navigator.pop(context);
     } catch (e) {
       print("게시글 작성 오류: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -102,42 +101,53 @@ class _CreatePostPageState extends State<CreatePostPage> {
         title: Text('게시글 작성', style: TextStyle(fontFamily: "GmarketBold")),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())  // 로딩 중
+          ? Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: '제목',
-                border: OutlineInputBorder(),
-                labelStyle: TextStyle(fontFamily: "GmarketMedium"),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      labelText: '제목',
+                      labelStyle: TextStyle(fontFamily: "GmarketMedium", fontSize: 16),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.indigo, width: 2.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: contentController,
+                    decoration: InputDecoration(
+                      labelText: '내용',
+                      alignLabelWithHint: true,
+                      labelStyle: TextStyle(fontFamily: "GmarketMedium", fontSize: 16),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.indigo, width: 2.0),
+                      ),
+                    ),
+                    maxLines: 10,
+                  ),
+                  SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () => _createPost(context),
+                      child: Text('저장', style: TextStyle(fontFamily: "GmarketBold", color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 20, 40, 153),
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: contentController,
-              decoration: InputDecoration(
-                labelText: '내용',
-                border: OutlineInputBorder(),
-                labelStyle: TextStyle(fontFamily: "GmarketMedium"),
-              ),
-              maxLines: 10,
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _createPost(context),  // 게시글 저장
-              child: Text('게시글 저장', style: TextStyle(fontFamily: "GmarketBold")),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF37003C),
-                padding: EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
