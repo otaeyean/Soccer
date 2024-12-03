@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'create_post_page.dart';
 import 'post_detail_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BoardPage extends StatefulWidget {
   @override
@@ -8,29 +11,22 @@ class BoardPage extends StatefulWidget {
 }
 
 class _BoardPageState extends State<BoardPage> {
-  List<Map<String, dynamic>> posts = [
-    {
-      'username': 'User1',
-      'title': '첫 번째 게시글1',
-      'commentCount': 5,
-      'timestamp': '2024-11-05 10:00',
-    },
-    {
-      'username': 'User2',
-      'title': '두 번째 게시글3',
-      'commentCount': 3,
-      'timestamp': '2024-11-05 11:00',
-    },
-  ];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _isLoggedIn = false;  // 로그인 여부를 관리할 변수ㅅ
 
-  void _addNewPost(String title, String content) {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();  // 로그인 상태 확인
+  }
+
+  // SharedPreferences에서 로그인 상태 확인
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userName = prefs.getString('userName');
+
     setState(() {
-      posts.add({
-        'username': 'NewUser',
-        'title': title,
-        'commentCount': 0,
-        'timestamp': DateTime.now().toString().substring(0, 16),
-      });
+      _isLoggedIn = userName != null && userName.isNotEmpty;  // userName 값이 있으면 로그인 상태
     });
   }
 
@@ -38,56 +34,52 @@ class _BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center( // 제목을 중앙 정렬
-          child: Text(
-            '자유게시판',
-            style: TextStyle(fontSize: 20), // 앱바 제목 크기 조정
-          ),
+        title: Center(
+          child: Text('자유게시판', style: TextStyle(fontSize: 20, fontFamily: "GmarketBold")),
         ),
-        automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
+        automaticallyImplyLeading: false,
       ),
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: ListTile(
-                title: Text(
-                  posts[index]['title'],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // 제목 글자 크기 증가
-                ),
-                subtitle: Text(
-                  '${posts[index]['username']} • 댓글 ${posts[index]['commentCount']}개 • ${posts[index]['timestamp']}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey), // 부제목 글자 크기 축소 및 색상 설정
-                ),
-                trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey), // 화살표 추가
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PostDetailPage(post: posts[index]),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore.collection('posts').orderBy('timestamp', descending: true).snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var post = snapshot.data!.docs[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                  child: ListTile(
+                    title: Text(post['title'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: "GmarketBold")),
+                    subtitle: Text(
+                      '${post['username']} • 댓글 ${post['commentCount']}개 • ${post['timestamp'].toDate().toString().substring(0, 16)}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey, fontFamily: "GmarketMedium"),
                     ),
-                  );
-                },
-              ),
-            ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PostDetailPage(postId: post.id)),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CreatePostPage(onSubmit: _addNewPost),
-            ),
-          );
-        },
+        onPressed: _isLoggedIn
+            ? () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CreatePostPage()));
+        }
+            : null,  // 로그인되지 않은 경우 버튼을 비활성화
         child: Icon(Icons.add),
+        backgroundColor: _isLoggedIn ? Colors.blue : Colors.grey,  // 로그인 상태에 따라 버튼 색상 변경
       ),
     );
   }
