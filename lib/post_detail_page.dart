@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const Color purple = Color(0xFF37003C);
+
 class PostDetailPage extends StatefulWidget {
   final String postId;
 
@@ -78,34 +80,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  void _deleteComment(String commentId, String commentUserName) async {
-    if (_userName != commentUserName) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('본인이 작성한 댓글만 삭제할 수 있습니다.')),
-      );
-      return;
-    }
-
-    try {
-      await _firestore.collection('posts').doc(widget.postId).collection('comments').doc(commentId).delete();
-      await _firestore.collection('posts').doc(widget.postId).update({
-        'commentCount': FieldValue.increment(-1),
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('댓글 삭제 중 오류가 발생했습니다.')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = _auth.currentUser;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('게시글 상세', style: TextStyle(fontFamily: "GmarketBold")),
-        backgroundColor: Colors.indigo,
+        title: Text(
+          '게시글 상세',
+          style: TextStyle(fontFamily: "GmarketBold", color: Colors.white), // 흰색 텍스트
+        ),
+        backgroundColor: purple,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: _firestore.collection('posts').doc(widget.postId).snapshots(),
@@ -125,15 +111,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   style: TextStyle(color: Colors.grey, fontSize: 14, fontFamily: "GmarketMedium"),
                 ),
                 SizedBox(height: 16),
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    post['content'],
-                    style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium"),
+                // 내용 부분을 Card로 감싸서 기본 색상 적용
+                Card(
+                 
+                  elevation: 1,  // 그림자 효과를 약간 추가
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      post['content'],
+                      style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium"),
+                    ),
                   ),
                 ),
                 Divider(height: 32),
@@ -151,6 +138,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Card(
+                           
+                              elevation: 1,  // 그림자 효과를 약간 추가
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                                 child: Column(
@@ -161,7 +150,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       style: TextStyle(
                                         fontFamily: "GmarketLight",
                                         fontSize: 12,
-                                        color: Colors.grey,
+                                        color: const Color.fromARGB(255, 57, 56, 56),
                                       ),
                                     ),
                                     SizedBox(height: 4),
@@ -174,7 +163,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                         alignment: Alignment.bottomRight,
                                         child: IconButton(
                                           icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                          onPressed: () => _deleteComment(comment.id, comment['username']),
+                                          onPressed: () => _addComment(comment.id),
                                         ),
                                       ),
                                   ],
@@ -201,7 +190,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.send, color: Colors.indigo),
+                        icon: Icon(Icons.send, color: purple),
                         onPressed: () => _addComment(_commentController.text),
                       ),
                     ],
