@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const Color purple = Color(0xFF37003C);
 class CreatePostPage extends StatefulWidget {
   @override
   _CreatePostPageState createState() => _CreatePostPageState();
@@ -114,7 +115,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       labelStyle: TextStyle(fontFamily: "GmarketMedium", fontSize: 16),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.indigo, width: 2.0),
+                        borderSide: BorderSide(color: purple, width: 2.0),
                       ),
                     ),
                   ),
@@ -127,7 +128,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       labelStyle: TextStyle(fontFamily: "GmarketMedium", fontSize: 16),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.indigo, width: 2.0),
+                        borderSide: BorderSide(color: purple, width: 2.0),
                       ),
                     ),
                     maxLines: 10,
@@ -139,7 +140,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       onPressed: () => _createPost(context),
                       child: Text('저장', style: TextStyle(fontFamily: "GmarketBold", color: Colors.white)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 20, 40, 153),
+                        backgroundColor:purple,
                         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),

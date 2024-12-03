@@ -46,9 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
     SchedulePage(),
     RankingPage(),
-    InfoPage(),     // 정보 페이지 위치 변경 (3번째)
+    BoardPage(),
+    InfoPage(),
     CustomizationPage(),
-    BoardPage(),     // 게시판 페이지 위치 변경 (5번째)
   ];
 
   @override
@@ -57,10 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadUserName();  // 앱 시작 시 유저 이름 로드
   }
 
+  // SharedPreferences에서 유저 이름을 로드하는 함수
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      userName = prefs.getString('userName');
+      userName = prefs.getString('userName');  // 로그인 상태에 맞는 유저 이름 로드
     });
   }
 
@@ -74,31 +75,32 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('KICK OFF', style: TextStyle(fontFamily: "GmarketBold")),
+        title: Text('KICK OFF', style: TextStyle(fontFamily: "GmarketBold"),),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: userName == null
+              child: userName == null  // 로그인하지 않은 경우
                   ? Text(
-                      'KICKOFF',
-                      style: TextStyle(color: Colors.white, fontSize: 24, fontFamily: "GmarketBold"),
-                    )
+                'KICKOFF',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontFamily: "GmarketBold"),
+              )
                   : Text(
-                      ' $userName님,\n 즐거운 축구 되세요!',
-                      style: TextStyle(color: Colors.white, fontSize: 23, fontFamily: "GmarketBold"),
-                    ),
+                ' $userName님,\n 즐거운 축구 되세요!',
+                style: TextStyle(color: Colors.white, fontSize: 23, fontFamily: "GmarketBold"),
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFF37003C),
               ),
             ),
+            // 로그인 여부에 따라 다르게 표시
             if (userName == null) ...[
               ListTile(
                 title: Text('로그인', style: TextStyle(fontFamily: "GmarketBold")),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // 사이드바 닫기
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LoginPage()),
@@ -108,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ListTile(
                 title: Text('회원가입', style: TextStyle(fontFamily: "GmarketBold")),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // 사이드바 닫기
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SignupPage()),
@@ -121,11 +123,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: Text('로그아웃', style: TextStyle(fontFamily: "GmarketBold")),
                 onTap: () async {
                   final prefs = await SharedPreferences.getInstance();
-                  prefs.remove('userName');
+                  prefs.remove('userName');  // 유저 이름 삭제
                   setState(() {
-                    userName = null;
+                    userName = null;  // 로그인 상태 초기화
                   });
-                  Navigator.pop(context);
+                  Navigator.pop(context);  // 사이드바 닫기
                 },
               ),
             ],
@@ -143,9 +145,9 @@ class _MyHomePageState extends State<MyHomePage> {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.schedule), label: '일정'),
           BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: '순위'),
-          BottomNavigationBarItem(icon: Icon(Icons.info), label: '정보'),  // 정보 위치 이동
+          BottomNavigationBarItem(icon: Icon(Icons.forum), label: '게시판'),
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: '정보'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: '맞춤화'),
-          BottomNavigationBarItem(icon: Icon(Icons.forum), label: '게시판'), // 게시판 위치 이동
         ],
       ),
     );
