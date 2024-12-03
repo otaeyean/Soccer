@@ -5,6 +5,7 @@ import 'create_post_page.dart';
 import 'post_detail_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const Color purple = Color(0xFF37003C);
 class BoardPage extends StatefulWidget {
   @override
   _BoardPageState createState() => _BoardPageState();
@@ -44,7 +45,7 @@ class _BoardPageState extends State<BoardPage> {
           ),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor:const Color.fromARGB(255, 20, 40, 153),  // 네이비 색상 배경 적용
+        backgroundColor:purple
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('posts').orderBy('timestamp', descending: true).snapshots(),
@@ -97,7 +98,7 @@ class _BoardPageState extends State<BoardPage> {
               }
             : null,
         child: Icon(Icons.add, color: Colors.white),  // 아이콘 색상을 흰색으로 변경
-        backgroundColor: _isLoggedIn ? const Color.fromARGB(255, 20, 40, 153) : Colors.grey,  // 네이비 색상 또는 회색 적용
+        backgroundColor: _isLoggedIn ?purple : Colors.grey,  // 퍼플 또는 회색 적용
       ),
     );
   }
