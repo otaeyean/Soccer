@@ -21,12 +21,11 @@ class InfoPage extends StatefulWidget {
 }
 
 class _InfoPageState extends State<InfoPage> {
-  String selectedTeam = '팀 선택';
-    String homeStadium = '';
+  String selectedTeam = '리버풀 FC';
+    String homeStadium = '안필드';
   final Color customColor = Color(0xFF37003C);
 
   final List<String> teamArray = [
-    '팀 선택',
     '리버풀 FC',
     '브라이튼 앤 호브 알비온 FC',
     '맨체스터 시티 FC',
@@ -127,15 +126,15 @@ class _InfoPageState extends State<InfoPage> {
               children: [
                 Text(
                   '홈구장: \n$homeStadium',
-                  style: TextStyle(fontSize: 17, fontFamily: "GmarketMedium"),
+                  style: TextStyle(fontSize: 15.5, fontFamily: "GmarketMedium"),
                 ),
                 DropdownButton<String>(
                   value: selectedTeam,
                   icon: Icon(Icons.arrow_downward, color: customColor),
-                  iconSize: 26,
+                  iconSize: 20,
                   elevation: 25,
                   style: TextStyle(fontSize: 15, color: customColor,fontFamily: "GmarketMedium"),
-                  underline: Container(height: 2, color: customColor),
+                  underline: Container(height: 2.5, color: customColor),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedTeam = newValue!;
