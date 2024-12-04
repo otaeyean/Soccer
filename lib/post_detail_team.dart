@@ -7,8 +7,9 @@ const Color purple = Color(0xFF37003C);
 
 class PostDetailPage extends StatefulWidget {
   final String postId;
+  final String boardType;
 
-  PostDetailPage({required this.postId});
+  PostDetailPage({required this.postId, required this.boardType});
 
   @override
   _PostDetailPageState createState() => _PostDetailPageState();
@@ -61,14 +62,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     try {
-      await _firestore.collection('posts').doc(widget.postId).collection('comments').add({
+      await _firestore.collection('board_posts').doc(widget.postId).collection('comments').add({
         'content': content.trim(),
         'userId': user.uid,
         'username': username,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      await _firestore.collection('posts').doc(widget.postId).update({
+      await _firestore.collection('board_posts').doc(widget.postId).update({
         'commentCount': FieldValue.increment(1),
       });
 
@@ -80,6 +81,20 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
+  void _deleteComment(String commentId) async {
+    try {
+      await _firestore.collection('board_posts').doc(widget.postId).collection('comments').doc(commentId).delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('댓글이 삭제되었습니다.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('댓글 삭제 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = _auth.currentUser;
@@ -87,16 +102,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '자유게시판',
-          style: TextStyle(fontFamily: "GmarketBold", color: Colors.white), // 흰색 텍스트
+          widget.boardType,
+          style: TextStyle(fontFamily: "GmarketBold", color: Colors.white),
         ),
         backgroundColor: purple,
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: _firestore.collection('posts').doc(widget.postId).snapshots(),
+        stream: _firestore.collection('board_posts').doc(widget.postId).snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text("게시글을 불러오는 데 실패했습니다."));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return Center(child: Text("해당 게시글을 찾을 수 없습니다."));
+          }
 
           var post = snapshot.data!;
           return Padding(
@@ -104,6 +129,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  widget.boardType,
+                  style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium", color: Colors.grey),
+                ),
+                SizedBox(height: 8),
                 Text(post['title'], style: TextStyle(fontSize: 28, fontFamily: "GmarketBold")),
                 SizedBox(height: 8),
                 Text(
@@ -111,51 +141,65 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   style: TextStyle(color: Colors.grey, fontSize: 14, fontFamily: "GmarketMedium"),
                 ),
                 SizedBox(height: 16),
-                // 내용 부분을 Card로 감싸서 기본 색상 적용
-                Text(
-                    post['content'],
-                    style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium")),
+                Text(post['content'], style: TextStyle(fontSize: 16, fontFamily: "GmarketMedium")),
                 Divider(height: 32),
                 Text('댓글', style: TextStyle(fontSize: 20, fontFamily: "GmarketBold")),
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: _firestore.collection('posts').doc(widget.postId).collection('comments').orderBy('timestamp').snapshots(),
+                    stream: _firestore.collection('board_posts').doc(widget.postId).collection('comments').orderBy('timestamp').snapshots(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(child: Text("댓글이 아직 없습니다."));
+                      }
 
                       return ListView.builder(
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           var comment = snapshot.data!.docs[index];
+                          bool isUserComment = comment['userId'] == user?.uid;
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Card(
-                           
-                              elevation: 1,  // 그림자 효과를 약간 추가
+                              elevation: 1,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                child: Column(
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      '댓글 작성자 : ${comment['username']}',
-                                      style: TextStyle(
-                                        fontFamily: "GmarketLight",
-                                        fontSize: 12,
-                                        color: const Color.fromARGB(255, 57, 56, 56),
+                                    // Comment content (username and text)
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '댓글 작성자 : ${comment['username']}',
+                                            style: TextStyle(
+                                              fontFamily: "GmarketLight",
+                                              fontSize: 12,
+                                              color: Color.fromARGB(255, 57, 56, 56),
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            comment['content'],
+                                            style: TextStyle(fontFamily: "GmarketMedium", fontSize: 14),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      comment['content'],
-                                      style: TextStyle(fontFamily: "GmarketMedium", fontSize: 14),
-                                    ),
-                                    if (user != null && comment['username'] == _userName)
+
+                                    // Delete button at the top-right
+                                    if (isUserComment)
                                       Align(
-                                        alignment: Alignment.bottomRight,
+                                        alignment: Alignment.topRight,
                                         child: IconButton(
-                                          icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                          onPressed: () => _addComment(comment.id),
+                                          icon: Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () => _deleteComment(comment.id),
                                         ),
                                       ),
                                   ],
