@@ -1,16 +1,23 @@
-# soccerapp
+# 킥오프 (KickOff)  
 
-A new Flutter project.
+---
 
-## Getting Started
+## 프로젝트 정보  
+- **프로젝트명**: 킥오프 (KickOff)  
+- **개발 목적**:  
+  - 프리미어리그 팬들을 위한 다양한 서비스를 제공하여 팬들이 프리미어 리그 정보에 더 쉽고 편리하게 접근하고, 팬들 간 소통을 통해 경기의 몰입도를 높이는 것이다.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 주요 기능  
+1. **사용자 등록 및 로그인**  
+2. **프리미어리그 경기 일정 및 문자중계 표시**  
+3. **문자중계를 통한 채팅 기능 제공**  
+4. **소속 팀의 홈구장, 선수 정보 제공**  
+5. **프리미어리그 관련 뉴스 제공**  
+6. **특정 팀에 대한 맞춤화 서비스 제공**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 설치 파일
+- 앱_설치파일.zip 압축 해제 후 .apk 파일 설치
